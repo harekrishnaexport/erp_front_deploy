@@ -1,0 +1,39 @@
+.setheading {
+    padding: 5px;
+    margin: 0 ;
+    color: #202223;
+    font-weight: 600 ;
+    font-size: 35px;
+    line-height: 32px;
+    font-family: "Poppins", "sans-serif"
+}
+.setcontainer {
+    max-width: 100% !important;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 30px;
+    z-index: 1;
+    background-color: #f9fafc;
+    padding-top: 80px;
+    overflow: hidden;
+  }
+  .setdisplay {
+    display: flex ;
+  }
+  
+  @media (max-width: 992px) {
+    .setdisplay {
+      display: block;
+    }
+  }
+  .setProductpaper {
+    text-align: left;
+    padding: 15px 12px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin: auto;
+    width: 100%;
+    border-radius: 10px !important;
+    margin-top: 30px;
+  }

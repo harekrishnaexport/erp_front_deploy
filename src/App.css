@@ -1,0 +1,109 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.setpageheading {
+  width: 100% !important;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items:center
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+.no-border {
+  border: none; /* Remove borders for the last 3 rows */
+}
+
+/* If you want to add a border only at the top for the last row */
+.tr:last-child {
+  border-top: 2px solid black; /* Add a top border to the last row */
+}
+.pdftableborder {
+  border-bottom: 1px solid #00000073;
+}
+
+/* .sstpl-visible {
+  opacity: 0.5;
+}
+.sstpl-visible.active {
+  opacity: 100;
+} */
+.onloadpage {
+  position: fixed;
+  z-index: 99999999;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  background: rgba(255, 255, 255, 0.8);
+} 
+.onloadpage .loader-div {
+  top: 50%;
+  position: relative;
+  right: 0;
+  left: 0;
+  text-align: center;
+  transform: translateY(-50%);
+}
+.loader-div span {
+  display: block;
+  margin: 20px 0 0;
+}
+.loader-logo {
+  width: 100px;
+}
+.loader {
+  font-size: 2rem;
+  font-family: sans-serif;
+  font-variant: small-caps;
+  font-weight: 900;
+  background: conic-gradient(#4f4f4f 0 50%, #c20004 50% 100%, #feefe7 50% 75%, #ffde2b 75%);
+  background-size: 200% 200%;
+  animation: animateBackground 1s ease-in-out infinite;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+  padding: 10px !important; /* Your desired padding value */
+}

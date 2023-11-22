@@ -21,9 +21,7 @@ const Productlist = () => {
   const classes = ProductStyle()
 
 
-  const handlesenddata = () => {
-    history.push('/app/productadd')
-  }
+ 
   useEffect(() => {
     fetchHiredata();
   }, []);
@@ -86,9 +84,6 @@ const Productlist = () => {
           <Typography variant="h4" gutterBottom className={classes.setheading}>
             Product List
           </Typography>
-          <Button variant="contained" size="medium" className={classes.setsendbtninside} onClick={handlesenddata}>
-            Add
-          </Button>
         </div>
 
         <Paper className={classes.setProductpaper} elevation={5}>

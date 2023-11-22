@@ -6,6 +6,12 @@ import {
   Container,
   Grid,
   Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Tooltip,
   Typography,
@@ -16,6 +22,8 @@ import { DotLoader } from "react-spinners";
 import { api } from "../../Axios";
 import { Link, useHistory, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { StyledTableCell, StyledTableRow } from "../../commonLink/TableDesign";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const EditPurchase = () => {
   const [name, setName] = useState("");
@@ -24,9 +32,31 @@ const EditPurchase = () => {
   const [expiry, setExpiry] = useState("");
   const [party, setParty] = useState("");
   const [totalamt, setTotalamt] = useState("");
-  const [errors, setErrors] = useState({});
   const [dbFetcherr, setDbFetcherr] = useState("");
   const [active, setActive] = useState(true);
+  const [rows, setRows] = useState([
+    {
+      srate: '',
+      totalamt: "",
+      name: "",
+      quantity: "",
+      rate: "",
+      expiry: "",
+      party: "",
+    },
+  ]);
+  const [errors, setErrors] = useState([
+    {
+      srate: '',
+      totalamt: "",
+      name: "",
+      quantity: "",
+      rate: "",
+      expiry: "",
+      party: "",
+    },
+  ]);
+
   const productidparam = useParams();
   const history = useHistory();
   const classes = ProductStyle();
@@ -36,12 +66,86 @@ const EditPurchase = () => {
     fetchProductdata();
   }, []);
 
+  const handleInputChange = (index, fieldName, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index][fieldName] = value;
+
+    if (updatedRows[0].party !== "") {
+      for (let i = 0; i < updatedRows.length; i++) {
+        updatedRows[i].party = updatedRows[0].party;
+      }
+    }
+
+    if (fieldName === "quantity" || fieldName === "rate") {
+      const qty = parseFloat(updatedRows[index].quantity);
+      const rate = parseFloat(updatedRows[index].rate);
+      updatedRows[index].totalamt =
+        isNaN(qty) || isNaN(rate) ? "" : (qty * rate).toFixed(2);
+    }
+    setRows(updatedRows);
+
+    const updatedErrors = [...errors];
+    updatedErrors[index] = { ...updatedErrors[index], [fieldName]: "" };
+    setErrors(updatedErrors);
+  };
+
+  const handlemoredata = () => {
+    setRows([
+      ...rows,
+      { srate: '', totalamt: "", name: "", quantity: "", rate: "", expiry: "" },
+    ]);
+    setErrors([...errors, {}]);
+  };
+
+  const handleRemoveRow = (index) => {
+    const updatedRows = [...rows];
+    updatedRows.splice(index, 1);
+    setRows(updatedRows);
+
+    const updatedErrors = [...errors];
+    updatedErrors.splice(index, 1);
+    setErrors(updatedErrors);
+  };
+
+  const validateFields = () => {
+    const newErrors = rows.map((row, index) => {
+      console.log(row);
+      const errors = {};
+      if (index === 0) {
+        if (row.party === "") {
+          errors.party = "required";
+        }
+      }
+      if (row.name === "") {
+        errors.name = "required";
+      }
+      if (row.rate === "") {
+        errors.rate = "required";
+      }
+      if (row.srate === "") {
+        errors.srate = "required";
+      }
+      if (row.quantity === "") {
+        errors.quantity = "required";
+      }
+      if (row.expiry === "") {
+        errors.expiry = "required";
+      }
+      return errors;
+    });
+
+    setErrors(newErrors);
+    return newErrors.every((err) => Object.values(err).every((v) => v === ""));
+
+  };
+
+
   useEffect(() => {
     if (quantity && rate) {
       const totalAmount = parseFloat(quantity) * parseFloat(rate);
-      setTotalamt(totalAmount.toFixed(2)); 
-    }else {
-        setTotalamt('')
+      setTotalamt(totalAmount.toFixed(2));
+    } else {
+      setTotalamt('')
     }
   }, [quantity, rate]);
 
@@ -55,6 +159,7 @@ const EditPurchase = () => {
       .then((result) => {
         console.log(result.data.result)
         setActive(false);
+        setRows(result.data.result)
         setName(result.data.result.name);
         setQuantity(result.data.result.quantity);
         setRate(result.data.result.rate);
@@ -91,56 +196,38 @@ const EditPurchase = () => {
     setParty(event.target.value);
   };
 
-  const senddata = (e) => {
-    if (!name || !quantity || !rate || !party || !expiry) {
-      if (!name) {
-        errors.name = "Required !";
-      } else {
-        errors.name = "";
-      }
-      if (!quantity) {
-        errors.quantity = "Required !";
-      } else {
-        errors.quantity = "";
-      }
-      if (!rate) {
-        errors.rate = "Required !";
-      } else {
-        errors.rate = "";
-      }
-      if (!party) {
-        errors.party = "Required !";
-      } else {
-        errors.party = "";
-      }
-      if (!expiry) {
-        errors.expiry = "Required !";
-      } else {
-        errors.expiry = "";
-      }
-      setErrors({ ...errors, [e.target.name]: e.target.value });
+  const calculateTotalAmount = () => {
+    let total = 0;
+    for (const row of rows) {
+      total += parseFloat(row.totalamt) || 0;
+    }
+    return total;
+  };
+  const totalAmount = calculateTotalAmount();
+
+  const senddata = () => {
+    if (!validateFields()) {
       setTimeout(() => {
-        setErrors({});
+        setErrors(Array.from({ length: rows.length }, () => ({}))); // Clear all errors
       }, 3000);
     } else {
-      const data = {
-        name,
-        quantity,
-        rate,
-        party,
-        expiry,
-        totalamt,
-      };
+      setActive(true);
       api
-        .post(`/purchase/purchasedetails_update/${productidparam.id}`, data, {
-          headers: {
-            Authorization: token,
-          },
-        })
+        .post(
+          `/purchase/purchasedetails_update/${productidparam.id}`,
+          { record: rows, totalAmount },
+          {
+            headers: {
+              Authorization: localStorage.getItem("ssAdmin"),
+            },
+          }
+        )
         .then((result) => {
+          setActive(false);
           history.push("/app/purchase");
         })
         .catch((err) => {
+          setActive(false);
           setDbFetcherr(err.response.data.error);
           setTimeout(() => {
             setDbFetcherr("");
@@ -148,6 +235,7 @@ const EditPurchase = () => {
         });
     }
   };
+  console.log(errors)
   return (
     <>
       <Container component="main" maxWidth="xl" className="setcontainer">
@@ -173,137 +261,209 @@ const EditPurchase = () => {
               {dbFetcherr}{" "}
             </Typography>
           )}
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3} className={classes.setinputlayout}>
-              <div>
-                <Typography className={classes.setlabel}>
-                  Party Name :
-                </Typography>
-                <TextField
-                  fullWidth
-                  id="outlined-basic"
-                  size="small"
-                  variant="outlined"
-                  placeholder="name *"
-                  value={party}
-                  onChange={handlemrp}
-                  className={classes.settextfield}
-                />
-              </div>
-              {errors.party && (
-                <Typography className={classes.setErrorLabel}>
-                  {errors.party}{" "}
-                </Typography>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6} md={3} className={classes.setinputlayout}>
-              <div>
-                <Typography className={classes.setlabel}>
-                  Product Name :{" "}
-                </Typography>
-                <TextField
-                  fullWidth
-                  id="outlined-basic"
-                  size="small"
-                  variant="outlined"
-                  placeholder="name *"
-                  value={name}
-                  onChange={handlename}
-                  className={classes.settextfield}
-                />
-                {errors.name && (
-                  <Typography className={classes.setErrorLabel}>
-                    {errors.name}{" "}
-                  </Typography>
-                )}
-              </div>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3} className={classes.setinputlayout}>
-              <div>
-                <Typography className={classes.setlabel}>Quantity :</Typography>
-                <TextField
-                  fullWidth
-                  id="outlined-basic"
-                  size="small"
-                  variant="outlined"
-                  placeholder="quantity *"
-                  value={quantity}
-                  onChange={handleqty}
-                  className={classes.settextfield}
-                />
-              </div>
-              {errors.quantity && (
-                <Typography className={classes.setErrorLabel}>
-                  {errors.quantity}{" "}
-                </Typography>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6} md={3} className={classes.setinputlayout}>
-              <div>
-                <Typography className={classes.setlabel}>Rate : </Typography>
-                <TextField
-                  fullWidth
-                  id="outlined-basic"
-                  size="small"
-                  variant="outlined"
-                  placeholder="amount *"
-                  value={rate}
-                  onChange={handleamount}
-                  className={classes.settextfield}
-                />
-              </div>
-              {errors.rate && (
-                <Typography className={classes.setErrorLabel}>
-                  {errors.rate}{" "}
-                </Typography>
-              )}
-            </Grid>
+          <TableContainer>
+            <Table className={classes.settable} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center" className={classes.tableth}>
+                    Party Name
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
+                    Product Name
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
+                    Quantity
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
+                    Rate
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
+                    Amount
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
+                    Seling Rate
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
+                    Expiry Date
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
+                    Action
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, index) => (
+                  <StyledTableRow key={index}>
+                    <StyledTableCell
+                      className={classes.tabletd}
+                      style={{ minWidth: "200px" }}
+                    >
+                      <TextField
+                        disabled={index !== 0}
+                        // error={errors[index].party === '' && errors[index].party}
+                        fullWidth
+                        type="text"
+                        id="outlined-basic"
+                        size="small"
+                        variant="outlined"
+                        placeholder="name *"
+                        value={row.party}
+                        onChange={(e) =>
+                          handleInputChange(index, "party", e.target.value)
+                        }
+                        className={classes.settextfield}
+                      />
+                    </StyledTableCell>
+                    <StyledTableCell
+                      className={classes.tabletd}
+                      style={{ minWidth: "200px" }}
+                    >
+                      <TextField
+                        // error={errors[index].name}
+                        fullWidth
+                        type="text"
+                        id="outlined-basic"
+                        size="small"
+                        variant="outlined"
+                        placeholder="Product Name *"
+                        value={row.name}
+                        onChange={(e) =>
+                          handleInputChange(index, "name", e.target.value)
+                        }
+                        className={classes.settextfield}
+                      />
+                    </StyledTableCell>
+                    <StyledTableCell
+                      className={classes.tabletd}
+                      align="center"
+                      style={{ maxWidth: "100px", minWidth: "130px" }}
+                    >
+                      <TextField
+                        // error={errors[index].quantity}
+                        fullWidth
+                        type="number"
+                        id="outlined-basic"
+                        size="small"
+                        variant="outlined"
+                        placeholder="quantity *"
+                        value={row.quantity}
+                        onChange={(e) =>
+                          handleInputChange(index, "quantity", e.target.value)
+                        }
+                        className={classes.settextfield}
+                      />
+                    </StyledTableCell>
+                    <StyledTableCell
+                      className={classes.tabletd}
+                      align="center"
+                      style={{ maxWidth: "100px", minWidth: "130px" }}
+                    >
+                      <TextField
+                        // error={errors[index].rate}
+                        fullWidth
+                        type="number"
+                        id="outlined-basic"
+                        size="small"
+                        variant="outlined"
+                        placeholder="rate *"
+                        value={row.rate}
+                        onChange={(e) =>
+                          handleInputChange(index, "rate", e.target.value)
+                        }
+                        className={`${classes.settextfield}`}
+                      />
+                    </StyledTableCell>
 
-            <Grid item xs={12} sm={6} md={3} className={classes.setinputlayout}>
-              <div>
-                <Typography className={classes.setlabel}>
-                  Total Amount :
-                </Typography>
-                <TextField
-                  fullWidth
-                  type="number"
-                  id="outlined-basic"
-                  size="small"
-                  variant="outlined"
-                  placeholder="total amount *"
-                  value={totalamt}
-                  //   onChange={handle}
-                  className={classes.settextfield}
-                />
-              </div>
-              {errors.mrp && (
-                <Typography className={classes.setErrorLabel}>
-                  {errors.mrp}{" "}
-                </Typography>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6} md={3} className={classes.setinputlayout}>
-              <div>
-                <Typography className={classes.setlabel}>Expiry :</Typography>
-                <TextField
-                  fullWidth
-                  type="date"
-                  id="outlined-basic"
-                  size="small"
-                  variant="outlined"
-                  placeholder=" *"
-                  value={expiry}
-                  onChange={handleexpiry}
-                  className={classes.settextfield}
-                />
-              </div>
-              {errors.expiry && (
-                <Typography className={classes.setErrorLabel}>
-                  {errors.expiry}{" "}
-                </Typography>
-              )}
-            </Grid>
-          </Grid>
+                    <StyledTableCell
+                      className={classes.tabletd}
+                      style={{ minWidth: "200px" }}
+                    >
+                      <TextField
+                        fullWidth
+                        type="number"
+                        id="outlined-basic"
+                        size="small"
+                        variant="outlined"
+                        placeholder="total amount *"
+                        value={row.totalamt}
+                        readOnly="true"
+                        className={classes.settextfield}
+                      />
+                    </StyledTableCell>
+                    <StyledTableCell
+                      className={classes.tabletd}
+                      align="center"
+                      style={{ maxWidth: "100px", minWidth: "130px" }}
+                    >
+                      <TextField
+                        // error={errors[index].srate}
+                        fullWidth
+                        type="number"
+                        id="outlined-basic"
+                        size="small"
+                        variant="outlined"
+                        placeholder="selling rate *"
+                        value={row.srate}
+                        onChange={(e) =>
+                          handleInputChange(index, "srate", e.target.value)
+                        }
+                        className={`${classes.settextfield}`}
+                      />
+                    </StyledTableCell>
+                    <StyledTableCell
+                      className={classes.tabletd}
+                      align="center"
+                      style={{ maxWidth: "130px", minWidth: "140px" }}
+                    >
+                      <TextField
+                        fullWidth
+                        // error={errors[index].expiry}
+                        type="date"
+                        id="outlined-basic"
+                        size="small"
+                        variant="outlined"
+                        placeholder=" *"
+                        value={row.expiry}
+                        onChange={(e) =>
+                          handleInputChange(index, "expiry", e.target.value)
+                        }
+                        className={classes.settextfield}
+                      />
+                    </StyledTableCell>
+                    <StyledTableCell
+                      className={classes.tabletd}
+                      align="center"
+                      style={{ maxWidth: "20px" }}
+                    >
+                 
+                      {index === 0 ? (
+                        <div></div>
+                      ) : (
+                        <Tooltip title="Remove">
+                          <DeleteIcon
+                            className={classes.setdeleteincon}
+                            onClick={() => handleRemoveRow(index)}
+                          />
+                        </Tooltip>
+                      )}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <div
+            className={classes.setsendbutton}
+            style={{
+              marginTop: "15px",
+              display: "flex",
+              alignItems: "center",
+              marginRight: "10px",
+            }}
+          >
+            <h4 style={{ margin: "10px 0" }}>Total Amount : </h4>
+            <span style={{ paddingLeft: "10px" }}>{totalAmount}</span>
+          </div>
           <div className={classes.setsendbutton}>
             <Button
               variant="contained"

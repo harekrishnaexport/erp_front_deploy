@@ -29,6 +29,33 @@ const ProductStyle = makeStyles((theme) => ({
     marginTop:'16px !important',
     border: "1px solid #202223",
   },
+  setmodeldisplay: {
+    position: "absolute",
+    top: "45%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    backgroundColor: "white !important",
+    border: "1px solid #000",
+    boxShadow: `${theme.shadows[8]}`,
+    borderRadius: "9px !important",
+    padding: 10,
+    [theme.breakpoints.down("xs")]: {
+      width: 300,
+      heigth: "200px !important",
+    },
+    // [theme.breakpoints.down("sm")]: {
+    //   width: 600,
+    //   heigth: "200px !important",
+    // },
+    [theme.breakpoints.up("lg")]: {
+      width: 1200,
+      // heigth: "200px !important",
+    },
+    [theme.breakpoints.between("sm", "md")]: {
+      width: 600, // Your styles for the range between lg and sm
+    },
+  },
   setmoreicon: {
     color: "black",
   },

@@ -205,7 +205,7 @@ const PurchaseList = () => {
                             <Tooltip title="Edit">
                               <EditIcon
                                 className={classes.seteditincon}
-                                onClick={() => handleedit(e._id)}
+                                onClick={() => handleedit(e.invoiceId)}
                               />
                             </Tooltip>
                           </div>

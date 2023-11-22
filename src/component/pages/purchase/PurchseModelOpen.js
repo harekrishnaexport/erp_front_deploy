@@ -14,7 +14,7 @@ import { Box } from "@mui/system";
 const PurchseModelOpen = ({ invoiceid }) => {
   const [billList, setBillList] = useState([]);
   const classes = BillStyle();
-const history = useHistory()
+  const history = useHistory()
   useEffect(() => {
     fetchHiredata();
   }, []);
@@ -54,7 +54,6 @@ const history = useHistory()
               <TableCell align="center" className={classes.tableth}>
                 qty
               </TableCell>
-
               <TableCell align="center" className={classes.tableth}>
                 Amount
               </TableCell>
@@ -67,15 +66,6 @@ const history = useHistory()
             {billList.map((e, index) => {
               return (
                 <StyledTableRow>
-                  <StyledTableCell
-                    align="center"
-                    component="th"
-                    scope="row"
-                    className={classes.tabletd}
-                  >
-                    {index + 1}
-                  </StyledTableCell>
-
                   <StyledTableCell className={classes.tabletd} align="center">
                     {e.party}
                   </StyledTableCell>
@@ -87,13 +77,13 @@ const history = useHistory()
                     {e.rate}
                   </StyledTableCell>
                   <StyledTableCell className={classes.tabletd} align="center">
-                    {e.qty}
+                    {e.quantity}
                   </StyledTableCell>
                   <StyledTableCell className={classes.tabletd} align="center">
-                    {e.amount}
+                    {e.totalamt}
                   </StyledTableCell>
                   <StyledTableCell className={classes.tabletd} align="center">
-                    {e.expiry}
+                    {moment(e.expiry).format("DD-MM-YYYY")}
                   </StyledTableCell>
                 </StyledTableRow>
               );

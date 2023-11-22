@@ -23,6 +23,7 @@ import EditPurchase from "../pages/purchase/EditPurchase";
 import EditBill from "../pages/Bill/EditBill";
 import ReturnOrder from "../pages/Bill/ReturnOrder";
 import ReturnRecord from "../pages/return/ReturnRecord";
+import ProductNameEdit from "../pages/Product/ProductNameEdit";
 
 const App = () => {
   return (
@@ -36,11 +37,14 @@ const App = () => {
           <Route path="/app/product_repot">
             <MonthlyProductDetails />
           </Route>
+          <Route path="/app/productedit/:id">
+            <EditProduct />
+          </Route>
           <Route path="/app/productadd">
             <AddProduct />
           </Route>
-          <Route path="/app/productedit/:id">
-            <EditProduct />
+          <Route path="/app/productnameedit/:id">
+            <ProductNameEdit />
           </Route>
           <Route path="/app/seller">
             <Sellerlist />

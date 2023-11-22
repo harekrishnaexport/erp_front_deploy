@@ -9,6 +9,8 @@ import {
   TableHead,
   TableRow,
   Tooltip,
+  Modal,
+  Box,
   Typography,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
@@ -20,12 +22,16 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Loader from "../../commonLink/Loader";
 import moment from "moment";
+import InfoIcon from "@mui/icons-material/Info";
+import PurchseModelOpen from "./PurchseModelOpen";
 
 const PurchaseList = () => {
   const [productList, setProductList] = useState([]);
   const [dbFetcherr, setDbFetcherr] = useState("");
   const [deleterr, setDeleterr] = useState("");
   const [active, setActive] = useState(true);
+  const [invoiceId, setInvoiceId] = useState("");
+  const [modelOpen, setModelOpen] = useState(false);
 
   const history = useHistory();
   const classes = ProductStyle();
@@ -38,8 +44,10 @@ const PurchaseList = () => {
   }, []);
 
   const fetchHiredata = () => {
+    
+
     api
-      .get("purchase/purchase_list", {
+      .get("purchase/purchasemaintbl_list", {
         headers: {
           Authorization: localStorage.getItem("ssAdmin"),
         },
@@ -61,6 +69,11 @@ const PurchaseList = () => {
       });
   };
 
+  const handleview = (data) => {
+    setInvoiceId(data);
+    setModelOpen(true);
+
+  }
   const handledelete = (e) => {
     setActive(true);
 
@@ -122,22 +135,16 @@ const PurchaseList = () => {
                     No.
                   </TableCell>
                   <TableCell align="center" className={classes.tableth}>
+                    Invoice Id
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
+                    Date
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
                     Party Name
                   </TableCell>
                   <TableCell align="center" className={classes.tableth}>
-                    Product
-                  </TableCell>
-                  <TableCell align="center" className={classes.tableth}>
-                    Quantity
-                  </TableCell>
-                  <TableCell align="center" className={classes.tableth}>
-                    Rate
-                  </TableCell>
-                  <TableCell align="center" className={classes.tableth}>
-                    Total Amount
-                  </TableCell>
-                  <TableCell align="center" className={classes.tableth}>
-                    Expiry
+                    amount
                   </TableCell>
                   <TableCell align="center" className={classes.tableth}>
                     Action
@@ -160,39 +167,25 @@ const PurchaseList = () => {
                         className={classes.tabletd}
                         align="center"
                       >
+                        {e.invoiceId}
+                      </StyledTableCell>
+                      <StyledTableCell
+                        className={classes.tabletd}
+                        align="center"
+                      >
+                        {moment(e.date).format("DD-MM-YYYY")}
+                      </StyledTableCell>
+                      <StyledTableCell
+                        className={classes.tabletd}
+                        align="center"
+                      >
                         {e.party}
                       </StyledTableCell>
                       <StyledTableCell
                         className={classes.tabletd}
                         align="center"
                       >
-                        {e.name}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        className={classes.tabletd}
-                        align="center"
-                      >
-                        {e.quantity}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        className={classes.tabletd}
-                        align="center"
-                      >
-                        {e.rate}
-                      </StyledTableCell>
-                      
-                      <StyledTableCell
-                        className={classes.tabletd}
-                        align="center"
-                      >
                         {e.totalamt}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        className={classes.tabletd}
-                        align="center"
-                        style={{ minWidth: "110px" }}
-                      >
-                        {moment(e.expiry).format("DD-MM-YYYY")}
                       </StyledTableCell>
 
                       <StyledTableCell
@@ -200,6 +193,14 @@ const PurchaseList = () => {
                         align="center"
                       >
                         <div className={classes.seticondiv}>
+                          <div>
+                            <Tooltip title="Bill Information">
+                              <InfoIcon
+                                className={classes.seteditincon}
+                                onClick={() => handleview(e.invoiceId)}
+                              />
+                            </Tooltip>
+                          </div>
                           <div>
                             <Tooltip title="Edit">
                               <EditIcon
@@ -227,6 +228,16 @@ const PurchaseList = () => {
         </Paper>
       </Container>
       <Loader active={active} />
+      <Modal
+        open={modelOpen}
+        onClose={() => setModelOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className={classes.setmodeldisplay}>
+          <PurchseModelOpen invoiceid={invoiceId} />
+        </Box>
+      </Modal>
     </>
   );
 };

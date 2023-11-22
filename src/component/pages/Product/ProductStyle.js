@@ -17,6 +17,21 @@ const ProductStyle = makeStyles((theme) => ({
     justifyContent: "start",
     backgroundColor: "#f9fafc",
   },
+  setlistfiltericon:{
+    display: "flex",
+    justifyContent: "flex-end",
+    marginRight:"10px"
+    // alignItems:'center'
+  },
+  setavtarback: {
+    backgroundColor: "transparent !important",
+    // marginLeft: "5px",
+    marginTop:'16px !important',
+    border: "1px solid #202223",
+  },
+  setmoreicon: {
+    color: "black",
+  },
   setErrorLabel: {
     fontFamily: '"Poppins", sans-serif',
     fontSize: '15px',

@@ -59,9 +59,9 @@ const ProductNameEdit = () => {
         } else {
 
             api
-                .post(`/product/productdetails_update_list/${productidparam.id}`, name, {
+                .post(`/product/productdetails_update_list/${productidparam.id}`, {name}, {
                     headers: {
-                        Authorization: token,
+                        Authorization: localStorage.getItem("ssAdmin"),
                     },
                 })
                 .then((result) => {

@@ -2,7 +2,9 @@ import {
   Avatar,
   Button,
   Divider,
+  MenuItem,
   Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -27,33 +29,59 @@ import Loader from "../../commonLink/Loader";
 const Addpurchase = () => {
   const [dbFetcherr, setDbFetcherr] = useState("");
   const [active, setActive] = useState(false);
+  const [productList, setProductList] = useState([]);
+  const [dbFetcherrProduct, setDbFetcherrProduct] = useState("");
+
   const [rows, setRows] = useState([
     {
-      srate: '',
+      srate: "",
       totalamt: "",
       name: "",
       quantity: "",
       rate: "",
       expiry: "",
       party: "",
+      mrp:''
     },
   ]);
   const [errors, setErrors] = useState([
     {
-      srate: '',
+      srate: "",
       totalamt: "",
       name: "",
       quantity: "",
       rate: "",
       expiry: "",
       party: "",
+      mrp:''
     },
   ]);
 
   const history = useHistory();
   const classes = ProductStyle();
+  useEffect(() => {
+    fetchHiredata();
+  }, []);
 
-  let token = localStorage.getItem("ssAdmin");
+  const fetchHiredata = () => {
+    api
+      .get("product/product_list_seperate", {
+        headers: {
+          Authorization: localStorage.getItem("ssAdmin"),
+        },
+      })
+      .then((result) => {
+        setActive(false);
+        setProductList(result.data.result);
+      })
+      .catch((err) => {
+        setActive(false);
+        setDbFetcherrProduct(err.response.data.error);
+        setTimeout(() => {
+          setDbFetcherr("");
+        }, 3000);
+      });
+  };
 
   const handleInputChange = (index, fieldName, value) => {
     const updatedRows = [...rows];
@@ -81,7 +109,7 @@ const Addpurchase = () => {
   const handlemoredata = () => {
     setRows([
       ...rows,
-      { srate: '', totalamt: "", name: "", quantity: "", rate: "", expiry: "" },
+      { srate: "", totalamt: "", name: "", quantity: "", rate: "", expiry: "",mrp:"" },
     ]);
     setErrors([...errors, {}]);
   };
@@ -107,7 +135,6 @@ const Addpurchase = () => {
 
   const validateFields = () => {
     const newErrors = rows.map((row, index) => {
-
       const errors = {};
       if (index === 0) {
         if (row.party === "") {
@@ -191,11 +218,11 @@ const Addpurchase = () => {
               {dbFetcherr}{" "}
             </Typography>
           )}
-          {/* {dbFetcherrProduct && (
+          {dbFetcherrProduct && (
             <Typography className={classes.setErrorLabel}>
               {dbFetcherrProduct}{" "}
             </Typography>
-          )} */}
+          )}
           <div className={classes.setlistfiltericon}>
             <Avatar
               className={classes.setavtarback}
@@ -227,6 +254,9 @@ const Addpurchase = () => {
                   </TableCell>
                   <TableCell align="center" className={classes.tableth}>
                     Seling Rate
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableth}>
+                    Mrp
                   </TableCell>
                   <TableCell align="center" className={classes.tableth}>
                     Expiry Date
@@ -263,20 +293,24 @@ const Addpurchase = () => {
                       className={classes.tabletd}
                       style={{ minWidth: "200px" }}
                     >
-                      <TextField
-                        error={errors[index].name}
+                      
+                      <Select
+                        style={{ padding: "0px" }}
                         fullWidth
-                        type="text"
-                        id="outlined-basic"
-                        size="small"
-                        variant="outlined"
-                        placeholder="Product Name *"
+                        id={`name-${index}`}
                         value={row.name}
-                        onChange={(e) =>
-                          handleInputChange(index, "name", e.target.value)
-                        }
                         className={classes.settextfield}
-                      />
+                        onChange={(e) => {
+                          handleInputChange(index, "name", e.target.value);
+                        }}
+                      >
+                        <MenuItem defaultValue="medicalname" value="">
+                          <em>None</em>
+                        </MenuItem>
+                        {productList.map((e) => (
+                          <MenuItem value={e._id}>{e.name}</MenuItem>
+                        ))}
+                      </Select>
                     </StyledTableCell>
                     <StyledTableCell
                       className={classes.tabletd}
@@ -351,6 +385,26 @@ const Addpurchase = () => {
                         value={row.srate}
                         onChange={(e) =>
                           handleInputChange(index, "srate", e.target.value)
+                        }
+                        className={`${classes.settextfield}`}
+                      />
+                    </StyledTableCell>
+                    <StyledTableCell
+                      className={classes.tabletd}
+                      align="center"
+                      style={{ maxWidth: "100px", minWidth: "130px" }}
+                    >
+                      <TextField
+                        error={errors[index].mrp}
+                        fullWidth
+                        type="number"
+                        id="outlined-basic"
+                        size="small"
+                        variant="outlined"
+                        placeholder="mrp *"
+                        value={row.mrp}
+                        onChange={(e) =>
+                          handleInputChange(index, "mrp", e.target.value)
                         }
                         className={`${classes.settextfield}`}
                       />

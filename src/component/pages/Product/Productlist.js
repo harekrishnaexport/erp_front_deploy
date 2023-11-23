@@ -1,4 +1,17 @@
-import { Button, Container, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
+import {
+  Button,
+  Container,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { api } from "../../Axios";
 import { StyledTableCell, StyledTableRow } from "../../commonLink/TableDesign";
@@ -7,25 +20,27 @@ import { useHistory } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Loader from "../../commonLink/Loader";
-import moment from 'moment'
+import moment from "moment";
 
 const Productlist = () => {
   const [loading, setLoading] = useState(true);
   const [productList, setProductList] = useState([]);
-  const [dbFetcherr, setDbFetcherr] = useState('');
-  const [deleterr, setDeleterr] = useState('');
+  const [dbFetcherr, setDbFetcherr] = useState("");
+  const [deleterr, setDeleterr] = useState("");
   const [active, setActive] = useState(true);
-
+  const [productListName, setProductListName] = useState([]);
+  const [dbFetcherrProduct, setDbFetcherrProduct] = useState("");
 
   const history = useHistory();
-  const classes = ProductStyle()
+  const classes = ProductStyle();
 
-
- 
   useEffect(() => {
     fetchHiredata();
   }, []);
 
+  useEffect(() => {
+    fetchHiredata();
+  }, []);
 
   const fetchHiredata = () => {
     api
@@ -35,11 +50,11 @@ const Productlist = () => {
         },
       })
       .then((result) => {
-        setActive(false)
+        setActive(false);
         setProductList(result.data.result);
       })
       .catch((err) => {
-        setActive(false)
+        setActive(false);
         if (err.response.status === 401) {
           localStorage.removeItem("ssAdmin");
           history.push("/");
@@ -49,10 +64,27 @@ const Productlist = () => {
           setDbFetcherr("");
         }, 3000);
       });
-  }
+    api
+      .get("product/product_list_seperate", {
+        headers: {
+          Authorization: localStorage.getItem("ssAdmin"),
+        },
+      })
+      .then((result) => {
+        setActive(false);
+        setProductListName(result.data.result);
+      })
+      .catch((err) => {
+        setActive(false);
+        setDbFetcherrProduct(err.response.data.error);
+        setTimeout(() => {
+          setDbFetcherrProduct("");
+        }, 3000);
+      });
+  };
 
   const handledelete = (e) => {
-    setActive(true)
+    setActive(true);
 
     api
       .delete(`product/productdetails_delete/${e}`, {
@@ -61,11 +93,11 @@ const Productlist = () => {
         },
       })
       .then((result) => {
-        setActive(false)
+        setActive(false);
         fetchHiredata();
       })
       .catch((err) => {
-        setActive(false)
+        setActive(false);
         setDeleterr(err.response.data.error);
         setTimeout(() => {
           setDeleterr("");
@@ -74,21 +106,34 @@ const Productlist = () => {
   };
 
   const handleedit = (data) => {
-    history.push(`/app/productedit/${data}`)
-  }
+    history.push(`/app/productedit/${data}`);
+  };
 
-  return <>
-
-    <Container component="main" maxWidth="xl" className='setcontainer'>
+  return (
+    <>
+      <Container component="main" maxWidth="xl" className="setcontainer">
         <div className={classes.setpageheading}>
           <Typography variant="h4" gutterBottom className={classes.setheading}>
-            Product List
+            Product Report
           </Typography>
         </div>
 
         <Paper className={classes.setProductpaper} elevation={5}>
-          {deleterr && <Typography className={classes.setErrorLabel}>{deleterr} </Typography>}
-          {dbFetcherr && <Typography className={classes.setErrorLabel}>{dbFetcherr} </Typography>}
+          {deleterr && (
+            <Typography className={classes.setErrorLabel}>
+              {deleterr}{" "}
+            </Typography>
+          )}
+          {dbFetcherr && (
+            <Typography className={classes.setErrorLabel}>
+              {dbFetcherr}{" "}
+            </Typography>
+          )}
+          {dbFetcherrProduct && (
+            <Typography className={classes.setErrorLabel}>
+              {dbFetcherrProduct}{" "}
+            </Typography>
+          )}
           <TableContainer>
             <Table className={classes.settable} aria-label="simple table">
               <TableHead>
@@ -120,50 +165,73 @@ const Productlist = () => {
                 {productList.map((e, index) => {
                   return (
                     <StyledTableRow>
-                      <StyledTableCell align="center" component="th" scope="row" className={classes.tabletd}>
+                      <StyledTableCell
+                        align="center"
+                        component="th"
+                        scope="row"
+                        className={classes.tabletd}
+                      >
                         {index + 1}
                       </StyledTableCell>
-                      <StyledTableCell className={classes.tabletd} align="center">
-                        {e.name}
+                      <StyledTableCell
+                        className={classes.tabletd}
+                        align="center"
+                      >
+                        {productListName.map((data) => {
+                          if (e.name === data._id) {
+                            return data.name
+                          }
+                        })}
                       </StyledTableCell>
-                      <StyledTableCell className={classes.tabletd} align="center">
+                      <StyledTableCell
+                        className={classes.tabletd}
+                        align="center"
+                      >
                         {e.quantity}
                       </StyledTableCell>
-                      <StyledTableCell className={classes.tabletd} align="center">
+                      <StyledTableCell
+                        className={classes.tabletd}
+                        align="center"
+                      >
                         {e.rate}
                       </StyledTableCell>
-                      <StyledTableCell className={classes.tabletd} align="center">
+                      <StyledTableCell
+                        className={classes.tabletd}
+                        align="center"
+                      >
                         {e.mrp}
                       </StyledTableCell>
-                      <StyledTableCell className={classes.tabletd} align="center" style={{minWidth:'110px'}}>
-                        { moment(e.expiry).format('DD-MM-YYYY')}
+                      <StyledTableCell
+                        className={classes.tabletd}
+                        align="center"
+                        style={{ minWidth: "110px" }}
+                      >
+                        {moment(e.expiry).format("DD-MM-YYYY")}
                       </StyledTableCell>
 
-
-
-                        <StyledTableCell
-                          className={classes.tabletdicon}
-                          align="center"
-                        >
-                          <div className={classes.seticondiv} >
-                            <div>
+                      <StyledTableCell
+                        className={classes.tabletdicon}
+                        align="center"
+                      >
+                        <div className={classes.seticondiv}>
+                          {/* <div>
                               <Tooltip title="Edit">
                                 <EditIcon
                                   className={classes.seteditincon}
                                   onClick={() => handleedit(e._id)}
                                 />
                               </Tooltip>
-                            </div>
-                            <div>
-                              <Tooltip title="Remove">
-                                <DeleteIcon
-                                  className={classes.setdeleteincon}
-                                  onClick={() => handledelete(e._id)}
-                                />
-                              </Tooltip>
-                            </div>
+                            </div> */}
+                          <div>
+                            <Tooltip title="Remove">
+                              <DeleteIcon
+                                className={classes.setdeleteincon}
+                                onClick={() => handledelete(e._id)}
+                              />
+                            </Tooltip>
                           </div>
-                        </StyledTableCell>
+                        </div>
+                      </StyledTableCell>
                     </StyledTableRow>
                   );
                 })}
@@ -171,9 +239,10 @@ const Productlist = () => {
             </Table>
           </TableContainer>
         </Paper>
-    </Container>
-    <Loader active={active} />
-  </>;
+      </Container>
+      <Loader active={active} />
+    </>
+  );
 };
 
 export default Productlist;

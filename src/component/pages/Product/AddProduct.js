@@ -252,7 +252,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Button, Container, Paper, Typography, Grid, TextField, Tooltip, Avatar } from "@mui/material";
-import { useReducer } from "react";
 import { api } from "../../Axios";
 import ProductStyle from "./ProductStyle";
 import Backdrop from "@mui/material/Backdrop";
@@ -267,7 +266,7 @@ const AddProduct = () => {
   const [rate, setRate] = useState('');
   const [expiry, setExpiry] = useState('');
   const [mrp, setMrp] = useState('');
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState('');
   const [dbFetcherr, setDbFetcherr] = useState('');
   const [active, setActive] = useState(true);
 
@@ -295,9 +294,9 @@ const AddProduct = () => {
       }, 3000);
     } else {
       api
-        .post("/product/productlist_add", name, {
+        .post("/product/productlist_add", {name}, {
           headers: {
-            Authorization: token,
+            Authorization: localStorage.getItem("ssAdmin"),
           },
         })
         .then((result) => {

@@ -136,7 +136,7 @@ const MonthlyProductDetails = () => {
   const [productList, setProductList] = useState([]);
   const [dbFetcherr, setDbFetcherr] = useState('');
   const [active, setActive] = useState(true);
-
+const [deleterr, setDeleterr] = useState('')
   const classes = ProductStyle()
 
   const history = useHistory();
@@ -148,7 +148,7 @@ const MonthlyProductDetails = () => {
 
   const fetchHiredata = () => {
     api
-      .get("product/productdetailsSeperate_list", {
+      .get("product/product_list_seperate", {
         headers: {
           Authorization: localStorage.getItem("ssAdmin"),
         },
@@ -203,7 +203,7 @@ const MonthlyProductDetails = () => {
     <Container component="main" maxWidth="xl" className='setcontainer'>
       <div className={classes.setpageheading}>
         <Typography variant="h4" gutterBottom className={classes.setheading}>
-          Product Name List
+          Product List
         </Typography>
           <Button variant="contained" size="medium" className={classes.setsendbtninside} onClick={handlesenddata}>
             Add

@@ -32,10 +32,10 @@ const App = () => {
         <Sidebar />
         <Switch>
           <Route path="/app/product">
-            <Productlist />
+            <MonthlyProductDetails />
           </Route>
           <Route path="/app/product_repot">
-            <MonthlyProductDetails />
+            <Productlist />
           </Route>
           <Route path="/app/productedit/:id">
             <EditProduct />

@@ -13,6 +13,7 @@ import BillStyle from "../Bill/BillStyle";
 import { Box } from "@mui/system";
 const PurchseModelOpen = ({ invoiceid }) => {
   const [billList, setBillList] = useState([]);
+  const [productList, setProductList] = useState([])
   const classes = BillStyle();
   const history = useHistory()
   useEffect(() => {
@@ -35,7 +36,24 @@ const PurchseModelOpen = ({ invoiceid }) => {
           history.push("/");
         }
       });
+
+
+      api
+      .get("product/product_list_seperate", {
+        headers: {
+          Authorization: localStorage.getItem("ssAdmin"),
+        },
+      })
+      .then((result) => {
+        // setActive(false);
+        setProductList(result.data.result);
+      })
+      .catch((err) => {
+        // setActive(false);
+       
+      });
   };
+
   return (
     <>
       <TableContainer>
@@ -70,7 +88,12 @@ const PurchseModelOpen = ({ invoiceid }) => {
                     {e.party}
                   </StyledTableCell>
                   <StyledTableCell className={classes.tabletd} align="center">
-                    {e.name}
+                    {productList.map((data) => {
+                      if(data._id === e.name){
+                        return data.name
+                      }
+                    })}
+                    {/* {e.name} */}
                   </StyledTableCell>
 
                   <StyledTableCell className={classes.tabletd} align="center">

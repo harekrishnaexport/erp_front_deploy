@@ -213,7 +213,7 @@ const PurchaseList = () => {
                             <Tooltip title="Remove">
                               <DeleteIcon
                                 className={classes.setdeleteincon}
-                                onClick={() => handledelete(e._id)}
+                                onClick={() => handledelete(e.invoiceId)}
                               />
                             </Tooltip>
                           </div>

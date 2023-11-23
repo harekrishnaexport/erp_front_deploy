@@ -11,7 +11,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
+  TableRow, MenuItem, Select,
   TextField,
   Tooltip,
   Typography,
@@ -34,6 +34,8 @@ const EditPurchase = () => {
   const [totalamt, setTotalamt] = useState("");
   const [dbFetcherr, setDbFetcherr] = useState("");
   const [active, setActive] = useState(true);
+  const [productList, setProductList] = useState([]);
+
   const [rows, setRows] = useState([
     {
       srate: '',
@@ -151,6 +153,24 @@ const EditPurchase = () => {
 
   const fetchProductdata = () => {
     api
+      .get("product/product_list_seperate", {
+        headers: {
+          Authorization: localStorage.getItem("ssAdmin"),
+        },
+      })
+      .then((result) => {
+        setActive(false);
+        setProductList(result.data.result);
+      })
+      .catch((err) => {
+        setActive(false);
+        setDbFetcherr(err.response.data.error);
+        setTimeout(() => {
+          setDbFetcherr("");
+        }, 3000);
+      });
+
+    api
       .get(`purchase/purchasedetails_update_detail/${productidparam.id}`, {
         headers: {
           Authorization: localStorage.getItem("ssAdmin"),
@@ -179,6 +199,8 @@ const EditPurchase = () => {
         }, 3000);
       });
   };
+
+
 
   const handlename = (event) => {
     setName(event.target.value);
@@ -251,7 +273,7 @@ const EditPurchase = () => {
             </Avatar>
           </Tooltip>
           <Typography variant="h4" gutterBottom className={classes.setheading}>
-            Edit Product
+            Edit Purchase
           </Typography>
         </div>
 
@@ -318,20 +340,24 @@ const EditPurchase = () => {
                       className={classes.tabletd}
                       style={{ minWidth: "200px" }}
                     >
-                      <TextField
-                        // error={errors[index].name}
+                      <Select
+                        disabled
+                        style={{ padding: "0px" }}
                         fullWidth
-                        type="text"
-                        id="outlined-basic"
-                        size="small"
-                        variant="outlined"
-                        placeholder="Product Name *"
+                        id={`name-${index}`}
                         value={row.name}
-                        onChange={(e) =>
-                          handleInputChange(index, "name", e.target.value)
-                        }
                         className={classes.settextfield}
-                      />
+                        onChange={(e) => {
+                          handleInputChange(index, "name", e.target.value);
+                        }}
+                      >
+                        <MenuItem defaultValue="medicalname" value="">
+                          <em>None</em>
+                        </MenuItem>
+                        {productList.map((e) => (
+                          <MenuItem value={e._id}>{e.name}</MenuItem>
+                        ))}
+                      </Select>
                     </StyledTableCell>
                     <StyledTableCell
                       className={classes.tabletd}
@@ -403,9 +429,9 @@ const EditPurchase = () => {
                         size="small"
                         variant="outlined"
                         placeholder="selling rate *"
-                        value={row.srate}
+                        value={row.sellingRate}
                         onChange={(e) =>
-                          handleInputChange(index, "srate", e.target.value)
+                          handleInputChange(index, "sellingRate", e.target.value)
                         }
                         className={`${classes.settextfield}`}
                       />
@@ -435,7 +461,7 @@ const EditPurchase = () => {
                       align="center"
                       style={{ maxWidth: "20px" }}
                     >
-                 
+
                       {index === 0 ? (
                         <div></div>
                       ) : (

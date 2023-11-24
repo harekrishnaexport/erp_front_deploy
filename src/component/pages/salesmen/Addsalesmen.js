@@ -65,6 +65,7 @@ const Addsalesmen = () => {
         setErrors({});
       }, 3000);
     } else {
+      setActive(true);
       const data = {
         name,
         email,
@@ -77,9 +78,13 @@ const Addsalesmen = () => {
           },
         })
         .then((result) => {
+          setActive(false);
+
           history.push("/app/salesmen");
         })
         .catch((err) => {
+          setActive(false);
+
           setDbFetcherr(err.response.data.error);
           setTimeout(() => {
             setDbFetcherr("");

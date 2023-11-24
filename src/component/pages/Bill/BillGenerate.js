@@ -81,7 +81,7 @@ const BillGenerate = () => {
   const [discount, setDiscount] = useState("");
   const [selectedMedical, setSelectedMedical] = useState("");
   const [selectedSeles, setselectedSeles] = useState("");
-
+  const [productListName, setProductListName] = useState([]);
   const history = useHistory();
   const theme = useTheme();
   const classes = BillStyle();
@@ -99,6 +99,23 @@ const BillGenerate = () => {
   }, []);
 
   const fetchHiredata = () => {
+    api
+      .get("product/product_list_seperate", {
+        headers: {
+          Authorization: localStorage.getItem("ssAdmin"),
+        },
+      })
+      .then((result) => {
+        setActive(false);
+        setProductListName(result.data.result);
+      })
+      .catch((err) => {
+        setActive(false);
+        setDbFetcherrProduct(err.response.data.error);
+        setTimeout(() => {
+          setDbFetcherrProduct("");
+        }, 3000);
+      });
     api
       .get("medical/medical_list", {
         headers: {
@@ -168,7 +185,7 @@ const BillGenerate = () => {
 
     if (fieldName === "proname") {
       const selectedProduct = productList.find(
-        (product) => product._id === value
+        (product) => product.name === value
       );
       if (selectedProduct) {
         updatedRows[index].rate = selectedProduct.rate;
@@ -176,20 +193,19 @@ const BillGenerate = () => {
         updatedRows[index].rate = "";
       }
     }
-
-    if (fieldName === "medicalname") {
+    if (updatedRows[0].medicalname !== "") {
       for (let i = 0; i < updatedRows.length; i++) {
-        console.log(updatedRows[i].medicalname);
-        updatedRows[i].medicalname = value;
+        updatedRows[i].medicalname = updatedRows[0].medicalname;
+        // console.log(updatedRows[i].medicalname);
       }
     }
-    console.log(fieldName);
-    if (fieldName === "salesmen") {
-      console.log(updatedRows);
+    if (updatedRows[0].salesmen !== "") {
       for (let i = 0; i < updatedRows.length; i++) {
-        updatedRows[i].salesmen = value;
+        updatedRows[i].salesmen = updatedRows[0].salesmen;
       }
     }
+    // console.log(fieldName);
+ 
     console.log(updatedRows);
 
     setRows(updatedRows);
@@ -302,8 +318,8 @@ const BillGenerate = () => {
         )
         .then((result) => {
           setActive(false);
-          history.push('/app/invoicerecord')
-          setProductList(result.data.result);
+          history.push("/app/invoicerecord");
+          // setProductList(result.data.result);
         })
         .catch((err) => {
           setActive(false);
@@ -423,7 +439,7 @@ const BillGenerate = () => {
                         <MenuItem defaultValue="medicalname" value="">
                           <em>None</em>
                         </MenuItem>
-                        {productList.map((e) => {
+                        {productListName.map((e) => {
                           return <MenuItem value={e._id}>{e.name}</MenuItem>;
                         })}
                       </Select>

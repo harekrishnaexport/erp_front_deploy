@@ -54,7 +54,7 @@ const Salesmen = () => {
     const handledelete = (e) => {
       setActive(true)
       api
-        .delete(`medical/medicaldetails_delete/${e}`, {
+        .delete(`sales/salesmendetails_delete/${e}`, {
           headers: {
             Authorization: localStorage.getItem("ssAdmin"),
           },

@@ -44,12 +44,11 @@ const InvoiceRecord = () => {
   const [dbFetcherr, setDbFetcherr] = useState("");
   const [billList, setBillList] = useState([]);
   const [billListSub, setBillListSub] = useState([]);
-  const [productList, setProductList] = useState([]);
+  const [productListName, setProductListName] = useState([])
   const [medicalList, setMedicalList] = useState([]);
   const [salesmenList, setSalesmenList] = useState([]);
   const [modelOpen, setModelOpen] = useState(false);
   const [invoiceId, setInvoiceId] = useState("");
-  const [deleteerror, setDeleteerror] = useState("");
   const [PdfSelectedData, setPdfSelectedData] = useState({});
   const [selectedSels, setSelectedSels] = useState({});
   const [dbFetcherrbank, setDbFetcherrbank] = useState("");
@@ -102,6 +101,8 @@ const InvoiceRecord = () => {
   };
 
   const fetchSellerdata = () => {
+    
+
     api
       .get("medical/medical_list", {
         headers: {
@@ -260,22 +261,24 @@ const InvoiceRecord = () => {
         setPdfDownload(false);
         setDbFetcherrbank("Server Error");
       });
-
-    api
-      .get("product/product_list", {
+      
+      api
+      .get("product/product_list_seperate", {
         headers: {
-          Authorization: token,
+          Authorization: localStorage.getItem("ssAdmin"),
         },
       })
       .then((result) => {
         setPdfDownload1(true);
-        setProductList(result.data.result);
+        setProductListName(result.data.result);
       })
       .catch((err) => {
         setPdfDownload1(false);
         setDbFetcherrbank("Server Error");
+        setTimeout(() => {
+          setDbFetcherrbank("");
+        }, 3000);
       });
-
     api
       .get("profile/profile_company_list", {
         headers: {
@@ -289,7 +292,9 @@ const InvoiceRecord = () => {
       .catch((err) => {
         setPdfDownload2(false);
         setDbFetcherrbank("Server Error");
-      });
+        setTimeout(() => {
+          setDbFetcherrbank("");
+        }, 3000);      });
 
     api
       .get("profile/profile_list", {
@@ -1002,7 +1007,7 @@ const InvoiceRecord = () => {
                       return (
                         <tr className="pdftableborder">
                           <td style={{ textAlign: "left" }}>
-                            {productList.map((data) => {
+                            {productListName.map((data) => {
                               if (data._id === e.product) {
                                 return data.name;
                               }

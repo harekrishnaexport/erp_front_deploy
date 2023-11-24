@@ -123,8 +123,25 @@ const EditBill = () => {
         }, 3000);
       });
 
-    api
-      .get("product/product_list", {
+    // api
+    //   .get("product/product_list", {
+    //     headers: {
+    //       Authorization: localStorage.getItem("ssAdmin"),
+    //     },
+    //   })
+    //   .then((result) => {
+    //     setActive(false);
+    //     setProductList(result.data.result);
+    //   })
+    //   .catch((err) => {
+    //     setActive(false);
+    //     setDbFetcherrProduct(err.response.data.error);
+    //     setTimeout(() => {
+    //       setDbFetcherr("");
+    //     }, 3000);
+    //   });
+      api
+      .get("product/product_list_seperate", {
         headers: {
           Authorization: localStorage.getItem("ssAdmin"),
         },
@@ -137,10 +154,9 @@ const EditBill = () => {
         setActive(false);
         setDbFetcherrProduct(err.response.data.error);
         setTimeout(() => {
-          setDbFetcherr("");
+          setDbFetcherrProduct("");
         }, 3000);
       });
-
     api
       .get("sales/salesmendetails_list", {
         headers: {
@@ -189,7 +205,7 @@ const EditBill = () => {
 
     if (fieldName === "product") {
       const selectedProduct = productList.find(
-        (product) => product._id === value
+        (product) => product.name === value
       );
       if (selectedProduct) {
         updatedRows[index].rate = selectedProduct.rate; // Set the rate only if selectedProduct is defined

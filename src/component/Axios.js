@@ -12,7 +12,6 @@ export default instance;
 //   },
 // });
 
-
 export const api = axios.create({
   baseURL: "https://hkiepl.onrender.com/api",
   headers: {

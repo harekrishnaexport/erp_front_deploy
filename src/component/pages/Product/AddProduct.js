@@ -285,6 +285,12 @@ const AddProduct = () => {
     setName(event.target.value);
   }
 
+  const handlekeypress = (e) => {
+    if (e.key === "Enter") {
+      senddata();
+    }
+  };
+
   const senddata = (e) => {
     if (!name) {
 
@@ -347,6 +353,7 @@ const AddProduct = () => {
                 placeholder="name *"
                 value={name}
                 onChange={handlename}
+                onKeyPress={handlekeypress}
                 className={classes.settextfield}
               />
               {errors && (

@@ -67,6 +67,7 @@ const InvoiceRecord = () => {
   const [pdfViewdata, setPdfViewdata] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
   const [isSelectedValueChanged, setIsSelectedValueChanged] = useState(false);
+  const [productListMrp, setProductListMrp] = useState([])
   const [paginationlist, setPaginationlist] = useState([]);
   const [dataView, setDataView] = useState(false);
   const [medicalid, setMedicalid] = useState("");
@@ -262,6 +263,20 @@ const InvoiceRecord = () => {
         setDbFetcherrbank("Server Error");
       });
       
+      api
+      .get("product/product_list", {
+        headers: {
+          Authorization: localStorage.getItem("ssAdmin"),
+        },
+      })
+      .then((result) => {
+        setPdfDownload1(true);
+        setProductListMrp(result.data.result);
+      })
+      .catch((err) => {
+        setPdfDownload1(false);
+      });
+
       api
       .get("product/product_list_seperate", {
         headers: {
@@ -1015,7 +1030,13 @@ const InvoiceRecord = () => {
                           </td>
                           <td style={{ textAlign: "center" }}>{e.rate}</td>
                           <td style={{ textAlign: "center" }}>{e.qty}</td>
-                          <td style={{ textAlign: "center" }}>{e.mrp}</td>
+                          <td style={{ textAlign: "center" }}>
+                          {productListMrp.map((data) => {
+                            console.log(data)
+                              if (data.name === e.product) {
+                                return data.mrp;
+                              }
+                            })}</td>
                           <td style={{ textAlign: "center" }}>{e.amount}</td>
                           {/* <td style={{ textAlign: "center" }}>{e.totalPayable}</td> */}
                         </tr>

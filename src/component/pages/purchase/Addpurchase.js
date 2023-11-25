@@ -150,6 +150,12 @@ const Addpurchase = () => {
       if (row.srate === "") {
         errors.srate = "required";
       }
+      for (let i = 0; i < index; i++) {
+        if (row.name === rows[i].name) {
+          errors.name = "Product already selected in another row";
+          break; // Exit the loop if a match is found
+        }
+      }
       if (row.quantity === "") {
         errors.quantity = "required";
       }
@@ -158,7 +164,6 @@ const Addpurchase = () => {
       }
       return errors;
     });
-    console.log(newErrors);
     setErrors(newErrors);
     return newErrors.every((err) => Object.values(err).every((v) => v === ""));
   };
@@ -296,6 +301,7 @@ const Addpurchase = () => {
                       
                       <Select
                         style={{ padding: "0px" }}
+                        error={errors[index].name}
                         fullWidth
                         id={`name-${index}`}
                         value={row.name}

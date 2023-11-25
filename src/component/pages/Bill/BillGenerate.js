@@ -452,14 +452,15 @@ const BillGenerate = () => {
                       <TextField
                         error={errors[index].rate}
                         fullWidth
+                        type='number'
                         id="outlined-basic"
                         size="small"
                         variant="outlined"
                         placeholder="rate *"
                         value={row.rate}
-                        // onChange={(e) =>
-                        //   handleInputChange(index, "rate", e.target.value)
-                        // }
+                        onChange={(e) =>
+                          handleInputChange(index, "rate", e.target.value)
+                        }
                         className={`${classes.settextfield}`}
                       />
                     </StyledTableCell>

@@ -44,7 +44,8 @@ const InvoiceRecord = () => {
   const [dbFetcherr, setDbFetcherr] = useState("");
   const [billList, setBillList] = useState([]);
   const [billListSub, setBillListSub] = useState([]);
-  const [productListName, setProductListName] = useState([])
+  const [billstateId, setBillstateId] = useState("");
+  const [productListName, setProductListName] = useState([]);
   const [medicalList, setMedicalList] = useState([]);
   const [salesmenList, setSalesmenList] = useState([]);
   const [modelOpen, setModelOpen] = useState(false);
@@ -67,7 +68,7 @@ const InvoiceRecord = () => {
   const [pdfViewdata, setPdfViewdata] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
   const [isSelectedValueChanged, setIsSelectedValueChanged] = useState(false);
-  const [productListMrp, setProductListMrp] = useState([])
+  const [productListMrp, setProductListMrp] = useState([]);
   const [paginationlist, setPaginationlist] = useState([]);
   const [dataView, setDataView] = useState(false);
   const [medicalid, setMedicalid] = useState("");
@@ -92,7 +93,6 @@ const InvoiceRecord = () => {
   var endIndex = page * perpage;
   useEffect(() => {
     var currentCards = billList.slice(startIndex, endIndex);
-    console.log(currentCards);
     setPaginationlist(currentCards);
   }, [page, billList]);
 
@@ -102,8 +102,6 @@ const InvoiceRecord = () => {
   };
 
   const fetchSellerdata = () => {
-    
-
     api
       .get("medical/medical_list", {
         headers: {
@@ -255,15 +253,25 @@ const InvoiceRecord = () => {
       })
       .then((result) => {
         setPdfDownload(true);
-
         setBillListSub(result.data.result);
+        const uniqueMedicalIds = new Set(
+          result.data.result.map((item) => item.medical)
+        );
+
+        // Convert Set to an array if needed
+        const uniqueMedicalIdsArray = Array.from(uniqueMedicalIds);
+
+        setBillstateId(uniqueMedicalIdsArray[0]);
+
+        // let updatedata = Array.from(new Set(result.data.result))
+        //   console.log(updatedata)
       })
       .catch((err) => {
         setPdfDownload(false);
         setDbFetcherrbank("Server Error");
       });
-      
-      api
+
+    api
       .get("product/product_list", {
         headers: {
           Authorization: localStorage.getItem("ssAdmin"),
@@ -277,7 +285,7 @@ const InvoiceRecord = () => {
         setPdfDownload1(false);
       });
 
-      api
+    api
       .get("product/product_list_seperate", {
         headers: {
           Authorization: localStorage.getItem("ssAdmin"),
@@ -309,7 +317,8 @@ const InvoiceRecord = () => {
         setDbFetcherrbank("Server Error");
         setTimeout(() => {
           setDbFetcherrbank("");
-        }, 3000);      });
+        }, 3000);
+      });
 
     api
       .get("profile/profile_list", {
@@ -938,15 +947,12 @@ const InvoiceRecord = () => {
                       margin: "0",
                     }}
                   >
-                    Billed to:{" "}
+                    BILLED TO:{" "}
                     <span>
                       {medicalList.map((data) => {
-                        return billListSub.map((e) => {
-                          if (e.medical && e.medical === data._id) {
-                            return data.name;
-                          }
-                          return null;
-                        });
+                        if (billstateId === data._id) {
+                          return data.name;
+                        }
                       })}
                     </span>
                   </h4>
@@ -963,25 +969,24 @@ const InvoiceRecord = () => {
                       }
                     })}
                   </h4>
-                  <h4
-                    style={{
-                      display: "flex",
-                      alignContent: "baseline",
-                      margin: "0",
-                    }}
-                  >
-                    Shop No :{" "}
+                  <div style={{display:"flex"}}>
+                    <h4
+                      style={{
+                        display: "flex",
+                        alignContent: "baseline",
+                        margin: "0",
+                      }}
+                    >
+                      Address:
+                    </h4>
                     <span style={{ paddingLeft: "5px" }}>
                       {medicalList.map((data) => {
-                        return billListSub.map((e) => {
-                          if (e.medical && e.medical === data._id) {
-                            return data.address;
-                          }
-                          return null;
-                        });
+                        if (billstateId === data._id) {
+                          return  data.address;
+                        }
                       })}
                     </span>
-                  </h4>
+                  </div>
                 </div>
                 <div
                   style={{
@@ -1018,7 +1023,6 @@ const InvoiceRecord = () => {
                   </thead>
                   <tbody>
                     {billListSub.map((e, index) => {
-                      console.log(e);
                       return (
                         <tr className="pdftableborder">
                           <td style={{ textAlign: "left" }}>
@@ -1031,12 +1035,12 @@ const InvoiceRecord = () => {
                           <td style={{ textAlign: "center" }}>{e.rate}</td>
                           <td style={{ textAlign: "center" }}>{e.qty}</td>
                           <td style={{ textAlign: "center" }}>
-                          {productListMrp.map((data) => {
-                            console.log(data)
+                            {productListMrp.map((data) => {
                               if (data.name === e.product) {
                                 return data.mrp;
                               }
-                            })}</td>
+                            })}
+                          </td>
                           <td style={{ textAlign: "center" }}>{e.amount}</td>
                           {/* <td style={{ textAlign: "center" }}>{e.totalPayable}</td> */}
                         </tr>

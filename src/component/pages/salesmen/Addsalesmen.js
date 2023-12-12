@@ -92,6 +92,21 @@ const Addsalesmen = () => {
         });
     }
   };
+
+  const handleEnterKey = (event) => {
+    if (event.key === "Enter") {
+      const inputs = document.querySelectorAll(".settextfield");
+      const currentIndex = Array.from(inputs).indexOf(event.target);
+      const nextInput = inputs[currentIndex + 1];
+
+      if (nextInput) {
+        nextInput.focus();
+      } else {
+        // If there is no next input, you can perform the desired action (e.g., submit the form)
+        senddata(event);
+      }
+    }
+  };
   return (
     <>
       <Container component="main" maxWidth="xl" className="setcontainer">
@@ -129,6 +144,7 @@ const Addsalesmen = () => {
                   placeholder="name *"
                   value={name}
                   onChange={handlename}
+                  onKeyPress={handleEnterKey}
                   className={classes.settextfield}
                 />
               </div>
@@ -149,6 +165,7 @@ const Addsalesmen = () => {
                   placeholder="email *"
                   value={email}
                   onChange={handleaddress}
+                  onKeyPress={handleEnterKey}
                   className={classes.settextfield}
                 />
               </div>
@@ -170,6 +187,7 @@ const Addsalesmen = () => {
                   placeholder="mobile *"
                   value={mobile}
                   onChange={handlemobile}
+                  onKeyPress={handleEnterKey}
                   className={classes.settextfield}
                 />
               </div>
